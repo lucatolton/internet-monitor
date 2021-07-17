@@ -184,6 +184,14 @@ app.get('/api/speedtest', function(req, res) {
 	});
 });
 
+app.get('/api/force/speedtest', function(req, res) {
+	speedTestFn();
+});
+
+app.get('/api/force/ping', function(req, res) {
+	pingFn();
+});
+
 app.get('/api/config', function(req, res) {
 	var publicConfig = {
 		speedTestEvery: config.speedTestEvery,
