@@ -1,0 +1,11 @@
+{
+	"silent": true,
+
+	"pingTo": "1.1.1.1",
+	"pingEvery": 10000,
+	"pingCount": 4,
+
+	"speedTestEvery": 3600000,
+
+	"logFile": "log.txt"
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Speedtest</title>
+		<link rel="stylesheet" href="/assets/Chart.css" />
+		<meta http-equiv="refresh" content="300">
+	</head>
+	<body>
+		<span style="position: absolute;right: 0;">Speed Monitor <span id="internetmon-version"></span> by Luca</span>
+		<canvas id="Chart1"></canvas>
+		<script src="/assets/Chart.min.js"></script>
+		<script src="/assets/moment.min.js"></script>
+		<script>
+			var data;
+			function getParameterByName(name, url) {
+				if (!url) url = window.location.href;
+				name = name.replace(/[\[\]]/g, '\\$&');
+				var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+					results = regex.exec(url);
+				if (!results) return null;
+				if (!results[2]) return '';
+				return decodeURIComponent(results[2].replace(/\+/g, ' '));
+			}
+
+			var xhr = new XMLHttpRequest();
+			var xhr = new XMLHttpRequest();
+			if (getParameterByName('d') && parseInt(getParameterByName('d')) < 30) {
+				//console.log('d');
+				var d = parseInt(getParameterByName('d'));
+				xhr.open('GET', `/api/speedtest?d=${d}`);
+				//console.log('/api/speedtest?d='+d);
+			} else if (getParameterByName('h') && parseInt(getParameterByName('h')) < 24) {
+				//console.log('h');
+				var h = parseInt(getParameterByName('h'));
+				xhr.open('GET', `/api/speedtest?h=${h}`);
+				//console.log(`/api/speedtest?h=${h}`);
+			} else {
+				//console.log('n');
+				xhr.open('GET', '/api/speedtest');
+			}
+			xhr.onload = function() {
+				data = JSON.parse(this.responseText);
+				var lineChartData = {
+					labels: [],
+					datasets: [
+						{
+							label: 'Download',
+							borderColor: 'purple',
+							backgroundColor: 'transparent',
+							spanGaps: false,
+							data: []
+						},
+						{
+							label: 'Upload',
+							borderColor: 'cyan',
+							backgroundColor: 'transparent',
+							spanGaps: false,
+							data: []
+						}
+					]
+				};
+				
+
+				var cXHR = new XMLHttpRequest();
+				cXHR.open('GET', '/api/config');
+				cXHR.onload = function() {
+					var first = (data[0]?data[0].timestamp:null);
+					var second = (data[1]?data[1].timestamp:null);
+					var thisTime = 0;
+					var addEmptySpace = false;
+
+					var publicConfig = JSON.parse(this.responseText);
+
+					document.getElementById('internetmon-version').innerText = publicConfig.version;
+					
+					window.timestamps = {
+						first,
+						second,
+						difference: (second-first),
+						publicConfig
+					};
+
+					function round(d) {
+						return Math.round(d/10)*10;
+					}
+
+					for (var i=0;i<data.length;i++) {
+						lineChartData.labels.push(moment.unix(data[i].timestamp==0?'u':data[i].timestamp).format('D MMM YY HH:mm'));
+
+						lineChartData.datasets[0].data.push(data[i].download==0?'u':data[i].download);
+						lineChartData.datasets[1].data.push(data[i].upload==0?'u':data[i].upload);
+
+						if (first && second && data[i] && data[i+1]) {
+							//console.log(moment.unix(data[i].timestamp).format('D MMM YY HH:mm'));
+							//console.log(data[i+1].timestamp);
+							//console.log(data[i].timestamp);
+							//console.log((data[i+1].timestamp)-(data[i].timestamp));
+
+							// Don't look at this shit code which doesn't always work
+							if (((round(data[i+1].timestamp)-round(data[i].timestamp)) != publicConfig.speedTestEvery/1000) && (round(data[i+1].timestamp)-round(data[i].timestamp)>publicConfig.speedTestEvery/1000) && Math.round((round(data[i+1].timestamp)-round(data[i].timestamp)) / (publicConfig.speedTestEvery/1000))>1) {
+								//console.log('This is where stuff needs to happen ' + moment.unix(data[i].timestamp).format('D MMM YY HH:mm'));
+								
+								var spacesToAdd = Math.round((round(data[i+1].timestamp)-round(data[i].timestamp)) / (publicConfig.speedTestEvery/1000));
+								var lastTimeStamp = data[i].timestamp;
+
+								for (var s=0;s<spacesToAdd;s++) {
+									if (spacesToAdd==1) continue;
+									if ((lastTimeStamp+(publicConfig.speedTestEvery/1000))>data[i+1].timestamp) continue;
+
+									lineChartData.labels.push(moment.unix(lastTimeStamp+(publicConfig.speedTestEvery/1000)).format('D MMM YY HH:mm'));
+									lineChartData.datasets[0].data.push('u');
+									lineChartData.datasets[1].data.push('u');
+									lastTimeStamp += (publicConfig.speedTestEvery/1000);
+								}
+							}
+						}
+					}
+
+					ctx = document.getElementById("Chart1").getContext("2d");
+					var myLineChart = new Chart(ctx, {
+						type: 'line',
+						data: lineChartData,
+						options: {
+							responsive: true
+						}
+					});
+				};
+
+				cXHR.send();
+			};
+
+			xhr.send();
+		</script>
+	</body>
+</html>

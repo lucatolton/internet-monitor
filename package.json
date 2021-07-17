@@ -1,0 +1,21 @@
+{
+  "name": "internetmonitor",
+  "version": "1.0.0",
+  "description": "An internet monitor that will ping and do speed tests at intervals",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "lucatolton",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.0.1",
+    "express": "^4.17.1",
+    "moment": "^2.22.1",
+    "morgan": "^1.9.1",
+    "ping": "^0.2.2",
+    "speedtest-net": "^1.6.0",
+    "sqlite3": "^4.1.1"
+  }
+}
