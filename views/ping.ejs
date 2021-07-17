@@ -6,7 +6,7 @@
 		<meta http-equiv="refresh" content="<%= reload %>">
 	</head>
 	<body>
-		<span style="position: absolute;right: 0;">Ping Monitor <span id="internetmon-version"></span> by Luca | Pinging <%= pingIp %> every <%= reload %> seconds | <a onclick="forcePing();">Force</a></span>
+		<span style="position: absolute;right: 0;">Ping Monitor <span id="internetmon-version"></span> by Luca | Pinging <%= pingIp %> every <%= reload %> seconds</span>
 		<canvas id="Chart1"></canvas>
 		<script src="/assets/Chart.min.js"></script>
 		<script src="/assets/moment.min.js"></script>
@@ -37,11 +37,6 @@
 				//console.log('n');
 				xhr.open('GET', '/api/ping');
 			}
-
-			function forcePing() {
-				xhr.open('GET', '/api/force/ping');
-			}
-
 			xhr.onload = function() {
 				data = JSON.parse(this.responseText);
 				var lineChartData = {
