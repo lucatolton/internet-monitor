@@ -9,8 +9,8 @@ var app = express();
 var morgan = require('morgan');
 var db = require('./db.js');
 
-console.log(moment().unix()); // 1576763732 - This will be stored in the database
-console.log(moment.unix(moment().unix()).format('HH:mm'));
+// console.log(moment().unix()); // 1576763732 - This will be stored in the database
+// console.log(moment.unix(moment().unix()).format('HH:mm'));
 
 // Load config
 var config;
@@ -63,7 +63,7 @@ function log (t, m) {
 log('INFO', `Internet Monitor by Luca Tolton | Running version ${packageJSON.version}`);
 log('CONFIG', `Ping To: ${config.pingTo} | Ping Every: ${config.pingEvery}ms | Ping Count: ${config.pingCount} | Speed Test Every: ${config.speedTestEvery}ms | Log file: ${config.logFile}`);
 if(!config.silent) {
-	log('WARNING', `Silent mode is currently DISABLED, your console will be spammed with all web requests. To enable silent mode, set silent to true in the config.json file`);
+	log('WARNING', `Silent mode is currently DISABLED, you will recieve a log of every web request. To enable silent mode, set silent to true in the config.json file`);
 }
 
 
@@ -195,5 +195,5 @@ app.get('/api/config', function(req, res) {
 });
 
 app.listen(5514, function() {
-	console.log('Listening on port 5514');
+	log('INFO', 'Listening on port 5514');
 });

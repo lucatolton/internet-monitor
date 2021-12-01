@@ -1,5 +1,5 @@
 {
-	"silent": true,
+	"silent": false,
 
 	"pingTo": "1.1.1.1",
 	"pingEvery": 30000,
